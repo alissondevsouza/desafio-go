@@ -1,16 +1,16 @@
-FROM golang:1.20.5 AS build
+FROM golang:alpine AS build
 
 WORKDIR /app
 
 COPY go.mod ./
 COPY main.go ./
 
-RUN go build -o /server
+RUN go build -ldflags '-s -w' main.go
 
-FROM gcr.io/distroless/base-debian10
+FROM scratch
 
 WORKDIR /
 
-COPY --from=build /server /server
+COPY --from=build /app /
 
-ENTRYPOINT [ "/server" ]
+ENTRYPOINT [ "/main" ]
